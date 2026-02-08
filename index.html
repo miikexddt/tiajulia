@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="La Tía Julia - Tu bodega de confianza. Encuentra golosinas, bebidas y más productos para tu hogar. Consulta stock en tiempo real.">
+    <meta name="keywords" content="bodega, tienda, golosinas, bebidas, abarrotes, La Tía Julia">
+    <title>La Tía Julia | Bodega - Tu bodega de confianza</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/desktop-overrides.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="Imagen/Logo/Logojulia.webp">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <a href="#" class="logo" onclick="window.app.resetView(); return false;">
+                <img src="Imagen/Logo/Logojulia.webp" alt="La Tía Julia" class="logo-image"
+                    onerror="this.onerror=null; this.src='https://via.placeholder.com/50x50?text=TJ'">
+                <div class="logo-text">
+                    <span class="logo-title">La Tía Julia</span>
+                    <span class="logo-subtitle">Tu bodega de confianza</span>
+                </div>
+            </a>
+
+            <!-- Menu Button (Mobile) -->
+            <button class="header-menu-btn" id="headerMenuBtn" aria-label="Abrir menú de categorías">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+                <span>Menú</span>
+            </button>
+
+            <div class="search-container">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="search" id="searchInput" class="search-input" placeholder="Buscar productos..."
+                    autocomplete="off">
+            </div>
+
+            <!-- Header Navigation -->
+            <nav class="header-nav">
+                <a href="#" class="nav-item" onclick="window.app.resetView(); return false;">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <span class="nav-text">Inicio</span>
+                </a>
+                <a href="#" class="nav-item nav-cart-item"
+                    onclick="document.getElementById('cartBtn').click(); return false;">
+                    <div class="nav-icon-wrapper">
+                        <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <span id="headerCartCount" class="header-cart-count">0</span>
+                    </div>
+                    <span class="nav-text">Carrito</span>
+                </a>
+                <a href="#footer" class="nav-item"
+                    onclick="document.querySelector('.footer').scrollIntoView({behavior: 'smooth'}); return false;">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    <span class="nav-text">Contactos</span>
+                </a>
+            </nav>
+
+            <!-- Admin button hidden for privacy -->
+            <div class="header-actions" style="display: none;">
+                <a href="admin.html" class="btn-admin">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z">
+                        </path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>Admin</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero / Promotions Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">La Tía Julia</h1>
+                <p class="hero-subtitle">Revisa nuestros productos disponibles y acércate a comprar</p>
+            </div>
+
+            <div class="promotions-container">
+                <h2 class="promotions-title">Promociones Destacadas</h2>
+                <div class="promotions-grid" id="promotionsGrid">
+                    <!-- Promociones se cargan dinámicamente -->
+                </div>
+                <p class="promo-disclaimer"
+                    style="text-align: center; font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 12px; padding: 0 20px;">
+                    * Promociones válidas únicamente para compras por esta página web con pago Yape.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stats-info">
+                    <div class="stat-item">
+                        <span class="stat-value" id="statTotal">0</span>
+                        <span class="stat-label">Productos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="statAvailable">0</span>
+                        <span class="stat-label">Disponibles</span>
+                    </div>
+                </div>
+
+                <div class="category-filters" id="categoryFilters">
+                    <!-- Categorías se cargan dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2 class="section-title" id="currentCategoryTitle">Todos los Productos</h2>
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    <!-- Productos se cargan dinámicamente -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>La Tía Julia</h3>
+                    <p>Tu bodega de confianza en el barrio. Ofrecemos productos de calidad a los mejores precios.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Métodos de Pago</h3>
+                    <ul class="payment-methods-list">
+                        <li class="payment-row">
+                            <span class="payment-badge">
+                                <svg class="footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Yape
+                            </span>
+                            <span class="payment-badge">
+                                <svg class="footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Plin
+                            </span>
+                        </li>
+                        <li class="payment-badge-full">
+                            <svg class="footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                            Efectivo contra entrega
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Ubicación y Contacto</h3>
+                    <ul class="contact-list">
+                        <li>
+                            <svg class="footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            UCV 270, Mz "G" Lt 08 Zona "C" Huaycán
+                        </li>
+                        <li>
+                            <svg class="footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg>
+                            WhatsApp: 970 405 671
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 La Tía Julia. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Cart Button -->
+    <button id="cartBtn" class="cart-float-btn">
+        <div class="cart-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+            <span id="cartCount" class="cart-count">0</span>
+        </div>
+        <span class="cart-label">Pagar Aquí</span>
+    </button>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal">
+            <div class="modal-header">
+                <h2>Tu Carrito</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cartItems" class="cart-items">
+                    <!-- Cart items will be rendered here -->
+                </div>
+                <div id="cartEmpty" class="cart-empty hidden">
+                    <p>Tu carrito está vacío</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cartTotal">S/ 0.00</span>
+                </div>
+                <button id="checkoutBtn" class="btn btn-primary btn-block">Proceder al Pago</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content checkout-modal">
+            <div class="modal-header">
+                <h2>Pagar con Yape</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Order Summary - First at the top -->
+                <div class="order-summary-section">
+                    <h4 class="order-summary-title">Tu Pedido</h4>
+                    <ul id="checkoutList" class="checkout-list"></ul>
+                    <div class="order-total-row">
+                        <span class="total-label">Total a pagar:</span>
+                        <span class="total-amount" id="paymentAmount">S/ 0.00</span>
+                    </div>
+                </div>
+
+                <!-- Main Payment Section: QR + Instructions -->
+                <div class="payment-main-section">
+                    <!-- Left: QR and Phone -->
+                    <div class="payment-qr-section">
+                        <div class="qr-frame">
+                            <img src="Imagen/Yape/qryapefinal.webp" alt="Codigo QR Yape" class="qr-image">
+                        </div>
+                        <div class="payment-phone-display">
+                            <span class="phone-label">O yapea al numero</span>
+                            <span class="phone-number">970 405 671</span>
+                        </div>
+                    </div>
+
+                    <!-- Right: Instructions -->
+                    <div class="payment-instructions">
+                        <h4 class="instructions-title">Instrucciones</h4>
+                        <div class="instruction-step">
+                            <span class="step-number">1</span>
+                            <span class="step-text">Abre tu app Yape y escanea el codigo QR</span>
+                        </div>
+                        <div class="instruction-step">
+                            <span class="step-number">2</span>
+                            <span class="step-text">Ingresa el monto y confirma el pago</span>
+                        </div>
+                        <div class="instruction-step">
+                            <span class="step-number">3</span>
+                            <span class="step-text">Presiona el boton verde para enviar tu pedido por WhatsApp</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="sendWhatsappBtn" class="btn btn-whatsapp btn-block">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                    </svg>
+                    Enviar Pedido por WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
