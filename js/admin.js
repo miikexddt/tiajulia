@@ -959,14 +959,124 @@ class AdminPanel {
     }
 
     async deletePromo(promoId) {
-        if (confirm('¿Eliminar esta promocion?')) {
+        // Find the promotion
+        const promotions = window.promotionManager.getPromotionsWithProducts();
+        const promo = promotions.find(p => p.id === promoId);
+        if (!promo || !promo.product) return;
+
+        // Remove any existing modal
+        const existing = document.getElementById('customDeleteModal');
+        if (existing) existing.remove();
+
+        // Create modal overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'customDeleteModal';
+        overlay.style.cssText = `
+            position: fixed; inset: 0; z-index: 99999;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.25s ease;
+        `;
+
+        // Create modal box
+        overlay.innerHTML = `
+            <div style="
+                background: #fff; border-radius: 16px; padding: 32px;
+                max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                transform: scale(0.9); transition: transform 0.25s ease;
+                text-align: center; font-family: 'Outfit', sans-serif;
+            " id="deleteModalBox">
+                <div style="
+                    width: 56px; height: 56px; margin: 0 auto 16px;
+                    background: #fff3f3; border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                ">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </div>
+                <h3 style="margin: 0 0 8px; font-size: 1.2rem; font-weight: 700; color: #1a1a2e;">
+                    Eliminar Promoción
+                </h3>
+                <p style="margin: 0 0 6px; font-size: 0.95rem; color: #555;">
+                    ¿Estás seguro de que deseas eliminar la promoción de
+                </p>
+                <p style="margin: 0 0 20px; font-size: 1rem; font-weight: 600; color: #1a1a2e;">
+                    "${promo.product.name}"?
+                </p>
+                <p style="margin: 0 0 24px; font-size: 0.8rem; color: #999;">
+                    Esta acción no se puede deshacer.
+                </p>
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button id="deleteModalCancel" style="
+                        padding: 10px 24px; border-radius: 10px; border: 2px solid #e0e0e0;
+                        background: #fff; color: #555; font-weight: 600; font-size: 0.9rem;
+                        cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+                    ">Cancelar</button>
+                    <button id="deleteModalConfirm" style="
+                        padding: 10px 24px; border-radius: 10px; border: none;
+                        background: #e53935; color: #fff; font-weight: 600; font-size: 0.9rem;
+                        cursor: pointer; transition: all 0.2s ease; font-family: inherit;
+                    ">Sí, eliminar</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '1';
+            document.getElementById('deleteModalBox').style.transform = 'scale(1)';
+        });
+
+        // Add hover effects
+        const cancelBtn = document.getElementById('deleteModalCancel');
+        const confirmBtn = document.getElementById('deleteModalConfirm');
+
+        cancelBtn.onmouseenter = () => { cancelBtn.style.background = '#f5f5f5'; cancelBtn.style.borderColor = '#ccc'; };
+        cancelBtn.onmouseleave = () => { cancelBtn.style.background = '#fff'; cancelBtn.style.borderColor = '#e0e0e0'; };
+        confirmBtn.onmouseenter = () => { confirmBtn.style.background = '#c62828'; confirmBtn.style.transform = 'translateY(-1px)'; };
+        confirmBtn.onmouseleave = () => { confirmBtn.style.background = '#e53935'; confirmBtn.style.transform = 'translateY(0)'; };
+
+        // Close modal helper
+        const closeModal = () => {
+            overlay.style.opacity = '0';
+            document.getElementById('deleteModalBox').style.transform = 'scale(0.9)';
+            setTimeout(() => overlay.remove(), 250);
+        };
+
+        // Cancel button
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Click outside to close
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeModal();
+        });
+
+        // Escape key to close
+        const escHandler = (e) => {
+            if (e.key === 'Escape') { closeModal(); document.removeEventListener('keydown', escHandler); }
+        };
+        document.addEventListener('keydown', escHandler);
+
+        // Confirm delete
+        confirmBtn.addEventListener('click', async () => {
+            confirmBtn.textContent = 'Eliminando...';
+            confirmBtn.style.opacity = '0.7';
+            confirmBtn.disabled = true;
             try {
                 await window.promotionManager.delete(promoId);
-                TiaJuliaUtils.showToast('Promocion eliminada');
+                TiaJuliaUtils.showToast('Promoción eliminada');
                 this.renderPromotions();
             } catch (error) {
                 TiaJuliaUtils.showToast('Error al eliminar: ' + error.message, 'error');
             }
-        }
+            closeModal();
+        });
     }
 }
