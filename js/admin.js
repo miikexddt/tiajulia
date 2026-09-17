@@ -162,26 +162,28 @@ class AdminPanel {
 
     async init() {
         this.cacheElements();
-        this.showLoading();
 
-        // Cargar productos desde Supabase
+        // Solo mostrar spinner si no hay caché
+        const hasCached = !!sessionStorage.getItem('tiajulia_admin_products');
+        if (!hasCached) this.showLoading();
+
+        // Cargar productos (renderá instantáneo si hay caché)
         await window.productManager.loadProducts();
 
-        // Cargar promociones desde Supabase
+        // Cargar promociones
         await window.promotionManager.loadPromotions();
 
-        // Suscribirse a cambios en tiempo real
+        // Suscribirse a cambios en tiempo real (evita doble render con flag)
         window.productManager.subscribeToChanges(() => {
-            this.render();
+            if (!this._suppressRealtime) this.render();
         });
 
         window.promotionManager.subscribeToChanges(() => {
-            this.renderPromotions();
+            if (!this._suppressRealtime) this.renderPromotions();
         });
 
         this.bindEvents();
         this.render();
-        this.hideLoading();
     }
 
     showLoading() {
@@ -645,7 +647,6 @@ class AdminPanel {
         this.elements.promotionTextGroup.style.display = isPromotion ? 'block' : 'none';
     }
 
-    // Stock quick edit
     async updateStock(productId, delta) {
         const product = window.productManager.getById(productId);
         if (!product) return;
@@ -653,10 +654,13 @@ class AdminPanel {
         const newStock = Math.max(0, product.stock + delta);
 
         try {
+            this._suppressRealtime = true;
             await window.productManager.updateStock(productId, newStock);
-            this.render();
+            this.updateStockInDOM(productId, newStock);
         } catch (error) {
             TiaJuliaUtils.showToast('Error al actualizar stock', 'error');
+        } finally {
+            setTimeout(() => { this._suppressRealtime = false; }, 3000);
         }
     }
 
@@ -664,11 +668,37 @@ class AdminPanel {
         const newStock = Math.max(0, parseInt(value) || 0);
 
         try {
+            this._suppressRealtime = true;
             await window.productManager.updateStock(productId, newStock);
-            this.render();
+            this.updateStockInDOM(productId, newStock);
         } catch (error) {
             TiaJuliaUtils.showToast('Error al actualizar stock', 'error');
+        } finally {
+            setTimeout(() => { this._suppressRealtime = false; }, 3000);
         }
+    }
+
+    updateStockInDOM(productId, newStock) {
+        if (!this.elements.productsTableBody) return;
+        const row = this.elements.productsTableBody.querySelector(`tr[data-id="${productId}"]`);
+        if (!row) return;
+
+        // Update input
+        const input = row.querySelector('.stock-edit-input');
+        if (input && document.activeElement !== input) {
+            input.value = newStock;
+        }
+
+        // Update badge
+        const badge = row.querySelector('.product-row-stock');
+        if (badge) {
+            const stockStatus = TiaJuliaUtils.getStockStatus(newStock);
+            badge.className = `product-row-stock ${stockStatus.class}`;
+            badge.textContent = stockStatus.text;
+        }
+
+        // Update stats summary
+        this.renderStats();
     }
 
     // Professional delete confirmation modal

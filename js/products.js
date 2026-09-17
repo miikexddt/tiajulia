@@ -23,8 +23,62 @@ class ProductManager {
         this.isLoading = false;
     }
 
-    // Cargar productos desde Supabase
+    // Clave de caché
+    static CACHE_KEY = 'tiajulia_admin_products';
+    static CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+    // Guardar productos en caché
+    _saveCache(products) {
+        try {
+            sessionStorage.setItem(ProductManager.CACHE_KEY, JSON.stringify({
+                data: products,
+                ts: Date.now()
+            }));
+        } catch (e) { /* sessionStorage lleno, ignorar */ }
+    }
+
+    // Leer caché (retorna null si expiró o no existe)
+    _readCache() {
+        try {
+            const raw = sessionStorage.getItem(ProductManager.CACHE_KEY);
+            if (!raw) return null;
+            const { data, ts } = JSON.parse(raw);
+            if (Date.now() - ts > ProductManager.CACHE_TTL) return null;
+            return data;
+        } catch (e) { return null; }
+    }
+
+    // Mapear fila de Supabase a formato local
+    _mapProduct(p) {
+        return {
+            id: p.id,
+            name: p.name,
+            price: parseFloat(p.price),
+            stock: p.stock,
+            category: p.category,
+            image: p.image || 'https://via.placeholder.com/400x300?text=Producto',
+            promotion: p.promotion,
+            promotionText: p.promotion_text
+        };
+    }
+
+    // Cargar productos: usa caché inmediata + refresca Supabase en fondo
     async loadProducts() {
+        // 1. Si hay caché válida, poblar this.products al instante y retornar
+        const cached = this._readCache();
+        if (cached && cached.length > 0) {
+            this.products = cached;
+            // Refrescar desde Supabase en segundo plano (sin bloquear)
+            this._refreshFromSupabase();
+            return this.products;
+        }
+
+        // 2. Sin caché: fetch bloqueante normal (primera visita)
+        return await this._refreshFromSupabase();
+    }
+
+    // Fetch desde Supabase y actualiza caché (puede ser en segundo plano)
+    async _refreshFromSupabase() {
         this.isLoading = true;
         try {
             const { data, error } = await window.supabaseClient
@@ -34,23 +88,13 @@ class ProductManager {
 
             if (error) throw error;
 
-            // Mapear campos de Supabase a formato local
-            this.products = data.map(p => ({
-                id: p.id,
-                name: p.name,
-                price: parseFloat(p.price),
-                stock: p.stock,
-                category: p.category,
-                image: p.image || 'https://via.placeholder.com/400x300?text=Producto',
-                promotion: p.promotion,
-                promotionText: p.promotion_text
-            }));
-
+            this.products = data.map(p => this._mapProduct(p));
+            this._saveCache(this.products);
             return this.products;
         } catch (error) {
             console.error('Error cargando productos:', error);
-            // Fallback a localStorage si Supabase falla
-            return this.loadFromLocalStorage();
+            if (this.products.length === 0) return this.loadFromLocalStorage();
+            return this.products;
         } finally {
             this.isLoading = false;
         }
@@ -218,7 +262,7 @@ class ProductManager {
             .on('postgres_changes',
                 { event: '*', schema: 'public', table: 'products' },
                 async () => {
-                    await this.loadProducts();
+                    await this._refreshFromSupabase();
                     if (callback) callback(this.products);
                 }
             )
@@ -236,8 +280,55 @@ class PromotionManager {
         this.isLoading = false;
     }
 
-    // Cargar promociones desde Supabase
+    // Clave de caché
+    static CACHE_KEY = 'tiajulia_admin_promotions';
+    static CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+    _saveCache(promotions) {
+        try {
+            sessionStorage.setItem(PromotionManager.CACHE_KEY, JSON.stringify({
+                data: promotions,
+                ts: Date.now()
+            }));
+        } catch (e) { /* sessionStorage lleno, ignorar */ }
+    }
+
+    _readCache() {
+        try {
+            const raw = sessionStorage.getItem(PromotionManager.CACHE_KEY);
+            if (!raw) return null;
+            const { data, ts } = JSON.parse(raw);
+            if (Date.now() - ts > PromotionManager.CACHE_TTL) return null;
+            return data;
+        } catch (e) { return null; }
+    }
+
+    _mapPromotion(p) {
+        return {
+            id: p.id,
+            productId: p.product_id,
+            quantity: p.quantity,
+            promoPrice: parseFloat(p.promo_price),
+            active: p.active,
+            createdAt: p.created_at
+        };
+    }
+
+    // Cargar promociones: usa caché inmediata + refresca Supabase en fondo
     async loadPromotions() {
+        // 1. Mostrar caché inmediatamente si existe
+        const cached = this._readCache();
+        if (cached) {
+            this.promotions = cached;
+            this._refreshFromSupabase();
+            return this.promotions;
+        }
+
+        // 2. Fetch bloqueante normal
+        return await this._refreshFromSupabase();
+    }
+
+    async _refreshFromSupabase() {
         this.isLoading = true;
         try {
             const { data, error } = await window.supabaseClient
@@ -248,19 +339,12 @@ class PromotionManager {
 
             if (error) throw error;
 
-            this.promotions = data.map(p => ({
-                id: p.id,
-                productId: p.product_id,
-                quantity: p.quantity,
-                promoPrice: parseFloat(p.promo_price),
-                active: p.active,
-                createdAt: p.created_at
-            }));
-
+            this.promotions = data.map(p => this._mapPromotion(p));
+            this._saveCache(this.promotions);
             return this.promotions;
         } catch (error) {
             console.error('Error cargando promociones:', error);
-            return [];
+            return this.promotions;
         } finally {
             this.isLoading = false;
         }
@@ -379,7 +463,7 @@ class PromotionManager {
             .on('postgres_changes',
                 { event: '*', schema: 'public', table: 'promotions' },
                 async () => {
-                    await this.loadPromotions();
+                    await this._refreshFromSupabase();
                     if (callback) callback(this.promotions);
                 }
             )
